@@ -175,17 +175,17 @@ void keyboard_post_init_user(void) {
      rgb_matrix_disable_noeeprom();
 }
 
+// Global brightness (~10%). Use macro so it's compile-time and accessible everywhere.
+#define LAYER_BRIGHTNESS 26
+
+// Helper to set color with lowered brightness.
+static inline void set_dim_hsv(uint8_t h, uint8_t s) {
+     rgb_matrix_sethsv_noeeprom(h, s, LAYER_BRIGHTNESS);
+}
+
 // Assign a unique solid color to each non-base layer; base layer keeps lighting off.
 layer_state_t layer_state_set_user(layer_state_t state) {
      uint8_t layer = get_highest_layer(state);
-
-     // Approx 10% brightness (255 * 0.10 ≈ 25.5). Using 26 for rounding.
-     const uint8_t LAYER_BRIGHTNESS = 26;
-
-     // Helper to set color with lowered brightness (C version, avoids C++ lambda).
-     static inline void set_dim_hsv(uint8_t h, uint8_t s) {
-          rgb_matrix_sethsv_noeeprom(h, s, LAYER_BRIGHTNESS);
-     }
 
      if (layer == LAYER_BASE) {
           rgb_matrix_disable_noeeprom();
