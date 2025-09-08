@@ -4,7 +4,7 @@ set -euo pipefail
 REPO="BlenderDude/bk_qmk_userspace"
 ARTIFACT_NAME="Firmware"
 UF2_NAME="bastardkb_charybdis_4x6_daniel.uf2"
-TIMEOUT_SECONDS=30
+TIMEOUT_SECONDS=120
 
 # Create a temporary directory for the artifact
 TMPDIR="$(mktemp -d)"
