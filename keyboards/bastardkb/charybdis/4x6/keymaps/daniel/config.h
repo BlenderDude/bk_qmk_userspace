@@ -40,5 +40,5 @@
 // Recommended with high-res scrolling to prevent overflow on heavy scroll traffic.
 #define WHEEL_EXTENDED_REPORT
 // Optionally tweak smoothness (defaults shown). Uncomment to adjust.
-// #define POINTING_DEVICE_HIRES_SCROLL_MULTIPLIER 120
-// #define POINTING_DEVICE_HIRES_SCROLL_EXPONENT   0
+#define POINTING_DEVICE_HIRES_SCROLL_MULTIPLIER 120
+#define POINTING_DEVICE_HIRES_SCROLL_EXPONENT   1
