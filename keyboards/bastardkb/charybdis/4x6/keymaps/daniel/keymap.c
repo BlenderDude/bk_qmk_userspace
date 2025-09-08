@@ -179,6 +179,14 @@ void keyboard_post_init_user(void) {
 layer_state_t layer_state_set_user(layer_state_t state) {
      uint8_t layer = get_highest_layer(state);
 
+     // Approx 10% brightness (255 * 0.10 ≈ 25.5). Using 26 for rounding.
+     const uint8_t LAYER_BRIGHTNESS = 26;
+
+     // Helper to set color with lowered brightness (C version, avoids C++ lambda).
+     static inline void set_dim_hsv(uint8_t h, uint8_t s) {
+          rgb_matrix_sethsv_noeeprom(h, s, LAYER_BRIGHTNESS);
+     }
+
      if (layer == LAYER_BASE) {
           rgb_matrix_disable_noeeprom();
           return state;
@@ -188,14 +196,14 @@ layer_state_t layer_state_set_user(layer_state_t state) {
      rgb_matrix_mode_noeeprom(RGB_MATRIX_NONE);
 
      switch (layer) {
-          case LAYER_LOWER:   rgb_matrix_sethsv_noeeprom(HSV_BLUE);    break;
-          case LAYER_RAISE:   rgb_matrix_sethsv_noeeprom(HSV_MAGENTA); break;
-          case LAYER_POINTER: rgb_matrix_sethsv_noeeprom(HSV_GREEN);   break;
-          case LAYER_EXTRA1:  rgb_matrix_sethsv_noeeprom(HSV_RED);     break;
-          case LAYER_EXTRA2:  rgb_matrix_sethsv_noeeprom(HSV_YELLOW);  break;
-          case LAYER_EXTRA3:  rgb_matrix_sethsv_noeeprom(HSV_CYAN);    break;
-          case LAYER_EXTRA4:  rgb_matrix_sethsv_noeeprom(HSV_ORANGE);  break;
-          default:            rgb_matrix_sethsv_noeeprom(HSV_WHITE);   break;
+          case LAYER_LOWER:   set_dim_hsv(170, 255); /* BLUE */      break;
+          case LAYER_RAISE:   set_dim_hsv(213, 255); /* MAGENTA */   break;
+          case LAYER_POINTER: set_dim_hsv( 85, 255); /* GREEN */     break;
+          case LAYER_EXTRA1:  set_dim_hsv(  0, 255); /* RED */       break;
+          case LAYER_EXTRA2:  set_dim_hsv( 43, 255); /* YELLOW */    break;
+          case LAYER_EXTRA3:  set_dim_hsv(128, 255); /* CYAN */      break;
+          case LAYER_EXTRA4:  set_dim_hsv( 28, 255); /* ORANGE */    break;
+          default:            set_dim_hsv(  0,   0); /* WHITE (sat0)*/break;
      }
 
      return state;
