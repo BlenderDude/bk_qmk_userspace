@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include QMK_KEYBOARD_H
+#include <math.h>
 
 
 enum charybdis_keymap_layers {
@@ -227,7 +228,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
      if (drag_scroll_active) {
           // Vertical-only scroll: map Y to wheel and suppress cursor movement.
-          mouse_report.v = mouse_report.y / 16;
+          mouse_report.v = (int8_t)ceilf((float)mouse_report.y / 4.0f);
           mouse_report.h = 0;
           mouse_report.x = 0;
           mouse_report.y = 0;
