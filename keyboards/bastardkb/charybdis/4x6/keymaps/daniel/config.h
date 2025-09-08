@@ -33,3 +33,12 @@
 // - `CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_TIMEOUT_MS`
 // - `CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD`
 #endif // POINTING_DEVICE_ENABLE
+
+/* High-resolution scrolling */
+// Enable smooth, fractional-resolution mouse wheel reports.
+#define POINTING_DEVICE_HIRES_SCROLL_ENABLE
+// Recommended with high-res scrolling to prevent overflow on heavy scroll traffic.
+#define WHEEL_EXTENDED_REPORT
+// Optionally tweak smoothness (defaults shown). Uncomment to adjust.
+// #define POINTING_DEVICE_HIRES_SCROLL_MULTIPLIER 120
+// #define POINTING_DEVICE_HIRES_SCROLL_EXPONENT   0

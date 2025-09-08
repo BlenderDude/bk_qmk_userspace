@@ -209,3 +209,29 @@ layer_state_t layer_state_set_user(layer_state_t state) {
      return state;
 }
 #endif // RGB_MATRIX_ENABLE
+
+#ifdef POINTING_DEVICE_ENABLE
+// Implement drag-scroll: when DRGSCRL is held, convert Y motion to vertical wheel only.
+static bool drag_scroll_active = false;
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+     switch (keycode) {
+          case DRGSCRL:
+               drag_scroll_active = record->event.pressed;
+               return false; // don't send keycode further
+          default:
+               return true;
+     }
+}
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+     if (drag_scroll_active) {
+          // Vertical-only scroll: map Y to wheel and suppress cursor movement.
+          mouse_report.v = mouse_report.y;
+          mouse_report.h = 0;
+          mouse_report.x = 0;
+          mouse_report.y = 0;
+     }
+     return mouse_report;
+}
+#endif // POINTING_DEVICE_ENABLE
