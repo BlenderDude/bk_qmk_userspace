@@ -16,9 +16,6 @@
  */
 #include QMK_KEYBOARD_H
 
-#ifdef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
-#    include "timer.h"
-#endif // CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
 
 enum charybdis_keymap_layers {
     LAYER_BASE = 0,
@@ -31,19 +28,7 @@ enum charybdis_keymap_layers {
     LAYER_EXTRA4,
 };
 
-/** \brief Automatically enable sniping-mode on the pointer layer. */
-
-#ifdef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
-static uint16_t auto_pointer_layer_timer = 0;
-
-#    ifndef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_TIMEOUT_MS
-#        define CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_TIMEOUT_MS 1000
-#    endif // CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_TIMEOUT_MS
-
-#    ifndef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD
-#        define CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD 0
-#    endif // CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD
-#endif     // CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
+/* Pointer layer exists but auto pointer layer trigger feature removed. */
 
 #define LOWER MO(LAYER_LOWER)
 #define RAISE MO(LAYER_RAISE)
@@ -181,42 +166,38 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-#ifdef POINTING_DEVICE_ENABLE
-#    ifdef CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
-report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    if (abs(mouse_report.x) > CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD || abs(mouse_report.y) > CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_THRESHOLD) {
-        if (auto_pointer_layer_timer == 0) {
-            layer_on(LAYER_POINTER);
-#        ifdef RGB_MATRIX_ENABLE
-            rgb_matrix_mode_noeeprom(RGB_MATRIX_NONE);
-            rgb_matrix_sethsv_noeeprom(HSV_GREEN);
-#        endif // RGB_MATRIX_ENABLE
-        }
-        auto_pointer_layer_timer = timer_read();
-    }
-    return mouse_report;
-}
-
-void matrix_scan_user(void) {
-    if (auto_pointer_layer_timer != 0 && TIMER_DIFF_16(timer_read(), auto_pointer_layer_timer) >= CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_TIMEOUT_MS) {
-        auto_pointer_layer_timer = 0;
-        layer_off(LAYER_POINTER);
-#        ifdef RGB_MATRIX_ENABLE
-        rgb_matrix_mode_noeeprom(RGB_MATRIX_DEFAULT_MODE);
-#        endif // RGB_MATRIX_ENABLE
-    }
-}
-#    endif // CHARYBDIS_AUTO_POINTER_LAYER_TRIGGER_ENABLE
-
-#    ifdef CHARYBDIS_AUTO_SNIPING_ON_LAYER
-layer_state_t layer_state_set_user(layer_state_t state) {
-    charybdis_set_pointer_sniping_enabled(layer_state_cmp(state, CHARYBDIS_AUTO_SNIPING_ON_LAYER));
-    return state;
-}
-#    endif // CHARYBDIS_AUTO_SNIPING_ON_LAYER
-#endif     // POINTING_DEVICE_ENABLE
-
 #ifdef RGB_MATRIX_ENABLE
 // Forward-declare this helper function since it is defined in rgb_matrix.c.
 void rgb_matrix_update_pwm_buffers(void);
-#endif
+
+// Disable lighting on boot (base layer requirement).
+void keyboard_post_init_user(void) {
+     rgb_matrix_disable_noeeprom();
+}
+
+// Assign a unique solid color to each non-base layer; base layer keeps lighting off.
+layer_state_t layer_state_set_user(layer_state_t state) {
+     uint8_t layer = get_highest_layer(state);
+
+     if (layer == LAYER_BASE) {
+          rgb_matrix_disable_noeeprom();
+          return state;
+     }
+
+     rgb_matrix_enable_noeeprom();
+     rgb_matrix_mode_noeeprom(RGB_MATRIX_NONE);
+
+     switch (layer) {
+          case LAYER_LOWER:   rgb_matrix_sethsv_noeeprom(HSV_BLUE);    break;
+          case LAYER_RAISE:   rgb_matrix_sethsv_noeeprom(HSV_MAGENTA); break;
+          case LAYER_POINTER: rgb_matrix_sethsv_noeeprom(HSV_GREEN);   break;
+          case LAYER_EXTRA1:  rgb_matrix_sethsv_noeeprom(HSV_RED);     break;
+          case LAYER_EXTRA2:  rgb_matrix_sethsv_noeeprom(HSV_YELLOW);  break;
+          case LAYER_EXTRA3:  rgb_matrix_sethsv_noeeprom(HSV_CYAN);    break;
+          case LAYER_EXTRA4:  rgb_matrix_sethsv_noeeprom(HSV_ORANGE);  break;
+          default:            rgb_matrix_sethsv_noeeprom(HSV_WHITE);   break;
+     }
+
+     return state;
+}
+#endif // RGB_MATRIX_ENABLE
