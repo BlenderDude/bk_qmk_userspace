@@ -41,4 +41,4 @@
 #define WHEEL_EXTENDED_REPORT
 // Optionally tweak smoothness (defaults shown). Uncomment to adjust.
 #define POINTING_DEVICE_HIRES_SCROLL_MULTIPLIER 120
-#define POINTING_DEVICE_HIRES_SCROLL_EXPONENT   1
+#define POINTING_DEVICE_HIRES_SCROLL_EXPONENT   2
