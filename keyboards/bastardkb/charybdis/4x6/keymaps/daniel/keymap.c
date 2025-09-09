@@ -229,7 +229,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
      if (drag_scroll_active) {
           // Vertical-only scroll: map Y to wheel and suppress cursor movement.
           static float scroll_accum = 0;
-          scroll_accum += (float)mouse_report.y / 64.0f;
+          scroll_accum += (float)mouse_report.y / 96.0f;
           int8_t scroll_val = (int8_t)scroll_accum;
           mouse_report.v = scroll_val;
           scroll_accum -= scroll_val;
